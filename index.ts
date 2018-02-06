@@ -1,10 +1,11 @@
-import TonePiano, { Piano } from 'tone-piano';
-import Tone, { Buffer, Master, Part, Transport } from 'tone';
+// import { Buffer, Master, Part, Transport } from 'tone';
+// import * as Tone from 'tone';
+
+import { Piano } from 'tone-piano';
+
 import * as Tonal from 'tonal';
 
-// Tone.js
-// TonePiano
-// tonal: https://github.com/danigb/tonal
+import './view';
 
 // https://github.com/tambien/Piano/blob/master/Demo.js
 // https://github.com/PAIR-code/deeplearnjs/blob/master/demos/performance_rnn/performance_rnn.ts
@@ -45,4 +46,5 @@ Piano.prototype.playChord = function(chord: string[] | number[]) {
 
 // Globals
 window['piano'] = piano;
+// window['Tone'] = Tone;
 window['Tonal'] = Tonal;
