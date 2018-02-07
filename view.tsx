@@ -20,18 +20,13 @@ export class App extends React.Component<any, AppState> {
 	render() {
 
 		return (
-			<div>
+			<div className="container">
 				{/*Chords*/}
 				<div>
 					{ this.state.chordSymbols.map((chordSymbol, i) => (
 						<div>
 							<ChordSymbolView key={i} symbol={chordSymbol} />
-							<button onClick={
-								() => {
-									this.state.chordSymbols.splice(i, 1);
-									this.setState({ chordSymbols: this.state.chordSymbols });
-								}
-							}>
+							<button onClick={this.removeChord.bind(this, i)}>
 								x
 							</button>
 						</div>
@@ -39,18 +34,24 @@ export class App extends React.Component<any, AppState> {
 					
 					) }
 				</div>
-				<button onClick={
-					() => {
-						this.state.chordSymbols.push(new ChordSymbol('C', 'M'));
-						this.setState({ chordSymbols: this.state.chordSymbols });
-					}
-				}>
+				<button onClick={this.addChord.bind(this)}>
 					Add chord
 				</button>
 
 			</div>
 		)
 	}
+
+	addChord() {
+		this.setState({ chordSymbols: this.state.chordSymbols.concat([ new ChordSymbol('C', 'M') ]) });
+	}
+
+	removeChord(i: number) {
+		const chordSymbols = this.state.chordSymbols.concat([]);
+		chordSymbols.splice(i, 1);
+		this.setState({ chordSymbols: chordSymbols });
+	}
+
 }
 
 interface ChordSymbolViewProps {
