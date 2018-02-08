@@ -25,10 +25,9 @@ piano.load(SALAMANDER_URL)
 	})
 
 // TODO refactor
-Piano.prototype.playNote = function(note: string | number, dur: Tone.Time = '4n', time: Tone.Time = Tone.now()) {
+Piano.prototype.playNote = function(note: string | number, dur: Tone.Time = '4n', time: Tone.Time = Tone.now(), velocity?: number) {
 	dur = Tone.Transport.toSeconds(dur);
-	this.keyDown(note, time);
-	this.keyUp(note, time + dur);
+	this.keyDown(note, time, velocity).keyUp(note, time + dur);
 }
 
 Piano.prototype.playNoteSeq = function(notes: string[] | number[], durs: Tone.Time[] = [], startTime: Tone.Time = Tone.now()) {
@@ -37,8 +36,7 @@ Piano.prototype.playNoteSeq = function(notes: string[] | number[], durs: Tone.Ti
 		let note = notes[i];
 		let dur = Tone.Transport.toSeconds(durs[i] || '4n');
 		if (note) {
-			this.keyDown(note, time);
-			this.keyUp(note, time + dur);
+			this.keyDown(note, time).keyUp(note, time + dur);
 		}
 		time += dur;
 	}
@@ -48,6 +46,39 @@ Piano.prototype.playChord = function(chord: string[] | number[], dur: Tone.Time 
 	for (let note of chord) {
 		this.playNote(note, dur, time);
 	}
+}
+
+// Taken from Demo.js
+Piano.prototype.playMidiFile = function (filename, autoplay = true) {
+	MidiConvert.load(filename).then((midi: any) => {
+		Tone.Transport.bpm.value = midi.bpm;
+		Tone.Transport.timeSignature = midi.timeSignature;
+
+		window['asdf'] = midi; // TODO tmp
+
+		for (let track in midi.tracks) {
+			// Schedule the pedal
+			let sustain = new Tone.Part((time, event) => {
+				if (event.value) {
+					this.pedalDown(time);
+				} else {
+					this.pedalUp(time);
+				}
+			}, midi.tracks[track].controlChanges[64]).start(0);
+	
+			let noteOffEvents = new Tone.Part((time, event) => {
+				this.keyUp(event.midi, time, event.velocity)
+			}, midi.tracks[track].noteOffs).start(0);
+	
+			let noteOnEvents = new Tone.Part((time, event) => {
+				this.keyDown(event.midi, time, event.velocity)
+			}, midi.tracks[track].notes).start(0);
+		}
+
+		if (autoplay) {
+			Tone.Transport.start();
+		}
+	})
 }
 
 const midi = new Midi();
@@ -71,4 +102,3 @@ midi.on('pedalUp', () => {
 // TODO refactor
 window['piano'] = piano;
 window['Tone'] = Tone;
-window['playMidiFile'] = playMidiFile;

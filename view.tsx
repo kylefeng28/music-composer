@@ -53,7 +53,7 @@ export class App extends React.Component<any, AppState> {
 	render() {
 
 		return (
-			<div className="container">
+			<div className="container" onDragOver={ ev => ev.preventDefault() } onDrop={ ev => ev.preventDefault() }>
 				{/*Chords*/}
 				<div>
 					{ this.state.chordSymbols.map((chordSymbol, i) => (
@@ -73,12 +73,22 @@ export class App extends React.Component<any, AppState> {
 
 				<br/>
 				<label>Notes</label>
-				<textarea defaultValue={this.state.notesDurs} onChange={(e) => this.setState({notesDurs: e.target.value})}>
+				<textarea defaultValue={this.state.notesDurs} onChange={ev => this.setState({notesDurs: ev.target.value})}>
 				</textarea>
 
 				<button onClick={this.playNotesDurs.bind(this, this.state.notesDurs.replace(/;\s/g, '\n').split('\n'))}>
 					Play notes
 				</button>
+
+				<div onDragOver={ev => ev.preventDefault() } onDrop={ev => {
+					ev.preventDefault();
+					const file = ev.dataTransfer.files[0];
+					const url = window.URL.createObjectURL(file);
+					console.log('Playing midi file: ' + file.name);
+					window['piano'].playMidiFile(url);
+				} }>
+					Drop a MIDI file here to play.
+				</div>
 
 			</div>
 		)
