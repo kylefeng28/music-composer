@@ -1,9 +1,11 @@
-import * as Tone from 'tone-piano/node_modules/tone';
+// import * as Tone from 'tone-piano/node_modules/tone';
+import * as Tone from 'tone';
 
 import { Piano } from 'tone-piano';
 import * as Tonal from 'tonal';
 
 import Midi from './Midi';
+import * as MidiConvert from 'midiconvert'
 
 import './view';
 
@@ -29,14 +31,16 @@ Piano.prototype.playNote = function(note: string | number, dur: Tone.Time = '4n'
 	this.keyUp(note, time + dur);
 }
 
-// TODO delay, zip array
-Piano.prototype.playNoteSeq = function(notes: string[] | number[], dur: Tone.Time = '4n', time: Tone.Time = Tone.now()) {
-	dur = Tone.Transport.toSeconds(dur);
-	const delay = 0.5;
+Piano.prototype.playNoteSeq = function(notes: string[] | number[], durs: Tone.Time[] = [], startTime: Tone.Time = Tone.now()) {
+	let time = startTime;
 	for (let i = 0; i < notes.length; i++) {
 		let note = notes[i];
-		this.keyDown(note, time + delay * i);
-		this.keyUp(note, time + delay * i + dur);
+		let dur = Tone.Transport.toSeconds(durs[i] || '4n');
+		if (note) {
+			this.keyDown(note, time);
+			this.keyUp(note, time + dur);
+		}
+		time += dur;
 	}
 }
 
@@ -67,3 +71,4 @@ midi.on('pedalUp', () => {
 // TODO refactor
 window['piano'] = piano;
 window['Tone'] = Tone;
+window['playMidiFile'] = playMidiFile;

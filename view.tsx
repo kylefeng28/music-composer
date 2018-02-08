@@ -5,14 +5,47 @@ import ChordSymbol from './ChordSymbol';
 
 interface AppState {
 	chordSymbols: ChordSymbol[];
+	notesDurs: string;
 }
+
+const Seitz4th = 
+`D4 2n;
+A3 2n;
+F#4 4n.;
+E4 8n;
+D4 4n;
+A3 4n;
+D4 4n;
+E4 4n;
+F#4 4n;
+A4 8n;
+G4 8n;
+F#4 2n;
+E4 4n;
+r 4n`;
+
+const rowRowRow = 
+`
+C4 4n; C4 4n; C4 8n.; D4 16n; E4 4n;
+E4 8n.; D4 16n; E4 8n.; F4 16n.; G4 2n;
+C5 8t; C5 8t; C5 8t;
+G4 8t; G4 8t; G4 8t;
+E4 8t; E4 8t; E4 8t;
+C4 8t; C4 8t; C4 8t;
+G4 8n.;
+F4 16n;
+E4 8n.;
+D4 16n;
+C4 2n;
+`
 
 export class App extends React.Component<any, AppState> {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			chordSymbols: [ new ChordSymbol('C', 'M') ]
+			chordSymbols: [ new ChordSymbol('C', 'M') ],
+			notesDurs: rowRowRow
 		}
 
 	}
@@ -38,6 +71,15 @@ export class App extends React.Component<any, AppState> {
 					Add chord
 				</button>
 
+				<br/>
+				<label>Notes</label>
+				<textarea defaultValue={this.state.notesDurs} onChange={(e) => this.setState({notesDurs: e.target.value})}>
+				</textarea>
+
+				<button onClick={this.playNotesDurs.bind(this, this.state.notesDurs.replace(/;\s/g, '\n').split('\n'))}>
+					Play notes
+				</button>
+
 			</div>
 		)
 	}
@@ -50,6 +92,19 @@ export class App extends React.Component<any, AppState> {
 		const chordSymbols = this.state.chordSymbols.concat([]);
 		chordSymbols.splice(i, 1);
 		this.setState({ chordSymbols: chordSymbols });
+	}
+
+	playNotesDurs(notesDurs: string[]) {
+		const notes = [];
+		const durs = [];
+		for (let noteDur of notesDurs) {
+			let [ note, dur ] = noteDur.split(/\s/);
+			notes.push(note);
+			durs.push(dur);
+		}
+		window['notes'] = notes;
+		window['durs'] = durs;
+		window['piano'].playNoteSeq(notes, durs);
 	}
 
 }

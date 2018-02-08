@@ -16,6 +16,7 @@
     "webpack": "^3.10.0"
   },
   "dependencies": {
+    "midiconvert": "^0.4.3",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "tonal": "^1.1.3",

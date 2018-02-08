@@ -1326,6 +1326,10 @@ jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
 
+jsmidgen@^0.1.5:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/jsmidgen/-/jsmidgen-0.1.5.tgz#ad0afd6375eb12f51064025393ce3baec380585d"
+
 json-loader@^0.5.4:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/json-loader/-/json-loader-0.5.7.tgz#dca14a70235ff82f0ac9a3abeb60d337a365185d"
@@ -1524,6 +1528,17 @@ micromatch@^3.0.3:
     regex-not "^1.0.0"
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
+
+midi-file-parser@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/midi-file-parser/-/midi-file-parser-1.0.0.tgz#175a013f277e9d26acf94cfe6c03b13abb0a1e9e"
+
+midiconvert@^0.4.3:
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/midiconvert/-/midiconvert-0.4.3.tgz#97623b0ddecf39dd9d12499aef96611a83bba585"
+  dependencies:
+    jsmidgen "^0.1.5"
+    midi-file-parser "^1.0.0"
 
 miller-rabin@^4.0.0:
   version "4.0.1"
