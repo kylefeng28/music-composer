@@ -5,19 +5,27 @@ import * as Tonal from 'tonal';
 export default class ChordSymbol {
 	rootNote: string;
 	quality: string;
-	inversion: number;
 	octave: number;
+	inversion: number;
 
-	constructor(rootNote: string, quality: string, inversion: number = 0, octave: number = 4) {
+	constructor(rootNote: string, quality: string, octave: number = 4, inversion: number = 0) {
 		// TODO make setters and getters; throw exceptions
 		this.rootNote = rootNote;
 		this.quality = quality;
-		this.inversion = inversion;
 		this.octave = octave;
+		this.inversion = inversion;
 	}
 
-	toNotes(): string {
-		return Tonal.chord(this.quality).map(Tonal.transpose(this.rootNote + this.octave));
+	toNotes(): string[] {
+		// Get intervals
+		let chord = Tonal.chord(this.quality);
+
+		// Find inversion
+		for (let i = 0; i < this.inversion; i++) {
+			chord.push(Tonal.Distance.add(chord.shift(), 'P8'));
+		}
+
+		return chord.map(Tonal.transpose(this.rootNote + this.octave));
 	}
 
 }
