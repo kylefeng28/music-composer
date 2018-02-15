@@ -36,7 +36,7 @@ Piano.prototype.playNoteSeq = function(notes: string[] | number[], durs: Tone.Ti
 		let note = notes[i];
 		let dur = Tone.Transport.toSeconds(durs[i] || '4n');
 		if (note) {
-			this.keyDown(note, time).keyUp(note, time + dur);
+			this.playNote(note, dur, time);
 		}
 		time += dur;
 	}
@@ -45,6 +45,18 @@ Piano.prototype.playNoteSeq = function(notes: string[] | number[], durs: Tone.Ti
 Piano.prototype.playChord = function(chord: string[] | number[], dur: Tone.Time = '4n', time: Tone.Time = Tone.now()) {
 	for (let note of chord) {
 		this.playNote(note, dur, time);
+	}
+}
+
+Piano.prototype.playChordSeq = function(chords: string[][] | number[][], durs: Tone.Time[] = [], startTime: Tone.Time = Tone.now()) {
+	let time = startTime;
+	for (let i = 0; i < chords.length; i++) {
+		let chord = chords[i];
+		let dur = Tone.Transport.toSeconds(durs[i] || '4n');
+		if (chord) {
+			this.playChord(chord, dur, time);
+		}
+		time += dur;
 	}
 }
 

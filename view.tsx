@@ -42,8 +42,8 @@ C4 2n;
 const canonChords = [
 	new ChordSymbol('D', 'M', 4),
 	new ChordSymbol('A', 'M', 3),
-	new ChordSymbol('B', 'M', 3),
-	new ChordSymbol('F#', 'M', 3),
+	new ChordSymbol('B', 'm', 3),
+	new ChordSymbol('F#', 'm', 3),
 	new ChordSymbol('G', 'M', 3),
 	new ChordSymbol('D', 'M', 3),
 	new ChordSymbol('G', 'M', 3),
@@ -69,6 +69,12 @@ export class App extends React.Component<any, AppState> {
 				Drop a MIDI file on this page to play.
 
 				{/*Chords*/}
+				<button className="btn btn-link" onClick={() => {
+					window['piano'].playChordSeq(this.state.chordSymbols.map((x) => x.toNotes()));
+				}}>
+					Play all
+				</button>
+
 				<div>
 					{ this.state.chordSymbols.map((chordSymbol, i) => (
 						<div className="row" style={{display: 'inline-block'}}>
@@ -77,16 +83,14 @@ export class App extends React.Component<any, AppState> {
 							setQuality={ (quality) => { this.state.chordSymbols[i].quality = quality; this.setState({chordSymbols: this.state.chordSymbols}); } }
 							setOctave={ (octave) => { this.state.chordSymbols[i].octave = octave; this.setState({chordSymbols: this.state.chordSymbols}); } }
 							setInversion={ (inversion) => { this.state.chordSymbols[i].inversion = inversion; this.setState({chordSymbols: this.state.chordSymbols}); } }
+							removeChord={this.removeChord.bind(this, i)}
 						/>
-							<button className="btn btn-danger" onClick={this.removeChord.bind(this, i)}>
-								x
-							</button>
 						</div>
 					)
 					
 					) }
 				</div>
-				<button className="btn btn-link" onClick={this.addChord.bind(this)}>
+				<button type="button" className="btn btn-link" onClick={this.addChord.bind(this)}>
 					Add chord
 				</button>
 
@@ -96,7 +100,18 @@ export class App extends React.Component<any, AppState> {
 					<textarea className="form-control" defaultValue={this.state.notesDurs} onChange={ev => this.setState({notesDurs: ev.target.value})}>
 					</textarea>
 
-					<button className="btn btn-link" onClick={this.playNotesDurs.bind(this, this.state.notesDurs.replace(/;\s/g, '\n').split('\n'))}>
+					<button type="button" className="btn btn-link" onClick={this.playNotesDurs.bind(this, this.state.notesDurs.replace(/;\s/g, '\n').split('\n'))}>
+						Play notes
+					</button>
+				</form>
+
+				{/* Notes */}
+				<form className="form">
+					<label>Notes</label>
+					<textarea className="form-control" defaultValue={this.state.notesDurs} onChange={ev => this.setState({notesDurs: ev.target.value})}>
+					</textarea>
+
+					<button type="button" className="btn btn-link" onClick={this.playNotesDurs.bind(this, this.state.notesDurs.replace(/;\s/g, '\n').split('\n'))}>
 						Play notes
 					</button>
 				</form>
@@ -123,6 +138,7 @@ export class App extends React.Component<any, AppState> {
 		this.setState({ chordSymbols: chordSymbols });
 	}
 
+	// TODO refactor into something more sensible
 	playNotesDurs(notesDurs: string[]) {
 		const notes = [];
 		const durs = [];
@@ -131,6 +147,8 @@ export class App extends React.Component<any, AppState> {
 			notes.push(note);
 			durs.push(dur);
 		}
+
+		// TODO
 		window['notes'] = notes;
 		window['durs'] = durs;
 		window['piano'].playNoteSeq(notes, durs);
@@ -144,6 +162,7 @@ interface ChordSymbolViewProps {
 	setQuality: (string) => void;
 	setOctave: (string) => void;
 	setInversion: (string) => void;
+	removeChord: () => void;
 }
 
 export class ChordSymbolView extends React.Component<ChordSymbolViewProps, any> {
@@ -153,17 +172,29 @@ export class ChordSymbolView extends React.Component<ChordSymbolViewProps, any> 
 
 	render() {
 		return (
-			<div>
-			<form className="form-inline">
-				<label>Root:</label> <input className="form-control col-1" type="text" defaultValue={this.props.symbol.rootNote} onChange={ev => this.props.setRoot(ev.target.value)} />
-				<label>Quality:</label> <input className="form-control col-1" type="text" defaultValue={this.props.symbol.quality} onChange={ev => this.props.setQuality(ev.target.value)} />
-				<label>Octave:</label> <input className="form-control col-1" type="number" defaultValue={this.props.symbol.octave+''} onChange={ev => this.props.setOctave(parseInt(ev.target.value))} />
-				<label>Inversion:</label> <input className="form-control col-1" type="number" defaultValue={this.props.symbol.inversion+''} onChange={ev => this.props.setInversion(parseInt(ev.target.value))} />
-				<label>Notes:</label> <span className="col-1">{this.props.symbol.toNotes().join(', ')}</span>
+			<div className="col-6">
+				<form className="form-inline">
+					<button aria-label="Remove chord" className="btn btn-sm btn-danger" onClick={() => this.props.removeChord()}>
+						x
+					</button>
 
-				<button className="btn btn-link" onClick={() => window['piano'].playChord(this.props.symbol.toNotes())}>Play chord</button>
-				<button className="btn btn-link" onClick={() => window['piano'].playNoteSeq(this.props.symbol.toNotes())}>Play arpeggio</button>
-			</form>
+					<label className="sr-only">Root:</label>
+					<input title="Root note" className="form-control form-control-sm col-1" type="text" defaultValue={this.props.symbol.rootNote} onChange={ev => this.props.setRoot(ev.target.value)} />
+					<label className="sr-only">Quality:</label>
+					<input className="form-control form-control-sm col-1" type="text" defaultValue={this.props.symbol.quality} onChange={ev => this.props.setQuality(ev.target.value)} />
+					<label aria-label="Octave">oct</label>
+					<input className="form-control form-control-sm col-1" type="text" defaultValue={this.props.symbol.octave+''} onChange={ev => this.props.setOctave(parseInt(ev.target.value))} />
+					<label aria-label="Inversion">inv</label>
+					<input className="form-control form-control-sm col-1" type="text" defaultValue={this.props.symbol.inversion+''} onChange={ev => this.props.setInversion(parseInt(ev.target.value))} />
+				</form>
+
+					<label>Notes:</label>
+					<span className="col-1">{this.props.symbol.toNotes().join(', ')}</span>
+
+					<br/>
+	
+					<button className="btn btn-link" onClick={() => window['piano'].playChord(this.props.symbol.toNotes())}>Play chord</button>
+					<button className="btn btn-link" onClick={() => window['piano'].playNoteSeq(this.props.symbol.toNotes())}>Play arpeggio</button>
 			</div>
 		);
 	}
